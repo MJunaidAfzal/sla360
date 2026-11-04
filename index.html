@@ -1,0 +1,821 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SLA360 | Streamline Automation, Commissioning &amp; Energy Services</title>
+<meta name="description" content="Owner-side integration of commissioning, controls and MSI that ensures buildings operate as one. Based in Tempe, Arizona and trusted nationally.">
+<link rel="icon" href="assets/logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,300..900&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --red:#e11d24; --red-2:#ff3b41;
+  --bg:#0a0b0d; --bg-2:#111317; --bg-3:#171a1f; --line:rgba(255,255,255,.09); --line-2:rgba(255,255,255,.16);
+  --text:#f2f3f5; --muted:#9aa1ab; --dim:#6b727c;
+  --light:#f4f4f2; --ink:#111317; --ink-muted:#5d636c; --ink-line:#e2e2de;
+  --ease:cubic-bezier(.2,.7,.1,1);
+  --display:"Archivo",system-ui,sans-serif; --sans:"Inter",system-ui,-apple-system,Segoe UI,sans-serif; --mono:"JetBrains Mono",ui-monospace,monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+html.lenis,html.lenis body{height:auto}
+.lenis.lenis-smooth{scroll-behavior:auto!important}
+body{font-family:var(--sans);background:var(--bg);color:var(--text);line-height:1.6;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+body.loading{overflow:hidden}
+img{max-width:100%;display:block}
+a{color:inherit;text-decoration:none}
+button,input,textarea{font:inherit;color:inherit}
+.wrap{width:min(1240px,100% - 40px);margin-inline:auto}
+.tagline{font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--red-2);display:inline-flex;align-items:center;gap:10px}
+.tagline::before{content:"";width:8px;height:8px;background:var(--red);box-shadow:0 0 12px var(--red)}
+h1,h2,h3{font-family:var(--display);font-stretch:112%;font-weight:800;letter-spacing:-.02em;line-height:1;text-transform:uppercase}
+h2{font-size:clamp(34px,5vw,70px);line-height:.98}
+.r{color:var(--red)}
+.out{-webkit-text-stroke:1.5px rgba(255,255,255,.85);color:transparent}
+.lead{color:var(--muted);font-size:clamp(16px,1.3vw,18.5px);max-width:58ch}
+.sub{font-family:var(--display);font-stretch:108%;font-weight:700;text-transform:uppercase;letter-spacing:-.005em;font-size:clamp(18px,1.9vw,26px);line-height:1.15;color:#fff;margin-top:18px}
+.light .sub{color:var(--ink)}
+.btn{display:inline-flex;align-items:center;gap:12px;padding:16px 26px;font-weight:700;font-size:14.5px;letter-spacing:.02em;border:1.5px solid transparent;cursor:pointer;transition:all .45s var(--ease);clip-path:polygon(0 0,calc(100% - 12px) 0,100% 12px,100% 100%,12px 100%,0 calc(100% - 12px))}
+.btn svg{width:18px;height:18px;transition:transform .45s var(--ease)}
+.btn:hover svg{transform:translateX(4px)}
+.btn-red{background:var(--red);color:#fff}
+.btn-red:hover{background:var(--red-2);box-shadow:0 0 40px -6px rgba(225,29,36,.8)}
+.btn-line{border-color:var(--line-2);color:#fff;background:rgba(255,255,255,.03)}
+.btn-line:hover{border-color:#fff;background:#fff;color:var(--ink)}
+
+/* loader */
+#loader{position:fixed;inset:0;z-index:999;background:var(--bg);display:grid;place-items:center;transition:opacity .6s ease .5s,visibility 0s 1.1s}
+#loader.done{opacity:0;visibility:hidden}
+#loader .ring{width:150px;height:150px;position:relative;transition:transform .9s var(--ease)}
+#loader.done .ring{transform:scale(1.6)}
+#loader svg{width:100%;height:100%;transform:rotate(-90deg)}
+#loader .trk{fill:none;stroke:rgba(255,255,255,.08);stroke-width:2}
+#loader .arc{fill:none;stroke:var(--red);stroke-width:2.5;stroke-linecap:round;stroke-dasharray:440;stroke-dashoffset:440;filter:drop-shadow(0 0 6px var(--red))}
+#loader .deg{position:absolute;inset:0;display:grid;place-items:center;font-family:var(--display);font-stretch:118%;font-weight:800;font-size:34px;letter-spacing:-.02em}
+#loader .deg sup{color:var(--red);font-size:20px}
+#loader .ld-cap{position:absolute;top:calc(100% + 26px);left:50%;transform:translateX(-50%);white-space:nowrap;font-family:var(--mono);font-size:11px;letter-spacing:.24em;color:var(--dim)}
+.ticks{position:absolute;inset:-14px;border-radius:50%;background:repeating-conic-gradient(from 0deg,rgba(255,255,255,.18) 0 .6deg,transparent .6deg 10deg);mask:radial-gradient(circle,transparent 68%,#000 69%,#000 72%,transparent 73%);-webkit-mask:radial-gradient(circle,transparent 68%,#000 69%,#000 72%,transparent 73%);animation:spin 14s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* header */
+.progress{position:fixed;top:0;left:0;height:2px;width:100%;transform-origin:0 50%;transform:scaleX(0);background:var(--red);box-shadow:0 0 10px var(--red);z-index:60}
+header.nav{position:fixed;inset:0 0 auto;z-index:50;padding:18px 0;transition:all .45s var(--ease)}
+header.nav .wrap{display:flex;align-items:center;justify-content:space-between;gap:24px}
+.brand img{height:44px;width:auto;transition:height .4s}
+.menu{display:flex;align-items:center;gap:4px;padding:6px;border:1px solid var(--line-2);background:rgba(17,19,23,.55);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+.menu>a,.more>button{position:relative;padding:10px 16px;font-size:14px;font-weight:600;color:rgba(255,255,255,.8);transition:color .3s,background .3s;background:none;border:0;cursor:pointer;display:flex;align-items:center;gap:8px;white-space:nowrap}
+.menu>a:hover,.more>button:hover,.more.open>button{color:#fff;background:rgba(255,255,255,.06)}
+.menu>a.active,.more.active>button{color:#fff;background:var(--red)}
+.more{position:relative}
+.more>button svg{width:12px;height:12px;transition:transform .35s var(--ease)}
+.more.open>button svg{transform:rotate(180deg)}
+.dd{position:absolute;right:-7px;top:calc(100% + 12px);width:270px;background:rgba(14,15,18,.97);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid var(--line-2);padding:8px;opacity:0;visibility:hidden;transform:translateY(-8px);transition:opacity .3s,transform .4s var(--ease),visibility 0s .4s}
+.dd::before{content:"";position:absolute;top:-1px;left:-1px;width:44px;height:2px;background:var(--red)}
+.more.open .dd{opacity:1;visibility:visible;transform:none;transition:opacity .3s,transform .4s var(--ease)}
+.dd a{display:flex;justify-content:space-between;align-items:center;padding:11px 12px;font-size:14px;font-weight:600;color:rgba(255,255,255,.82);transition:background .25s,color .25s,padding .35s var(--ease)}
+.dd a small{font-family:var(--mono);font-size:11px;color:var(--dim);transition:color .25s}
+.dd a:hover,.dd a.active{background:rgba(225,29,36,.12);color:#fff;padding-left:18px}
+.dd a:hover small,.dd a.active small{color:var(--red-2)}
+.dd hr{border:0;border-top:1px solid var(--line);margin:6px 4px}
+.nav-r{display:flex;align-items:center;gap:14px}
+.phone{font-family:var(--mono);font-size:13px;color:rgba(255,255,255,.75)}
+.nav-cta{padding:12px 20px;font-size:13.5px}
+header.nav.scrolled{background:rgba(10,11,13,.82);backdrop-filter:blur(16px) saturate(1.3);-webkit-backdrop-filter:blur(16px) saturate(1.3);padding:10px 0;box-shadow:0 1px 0 var(--line)}
+header.nav.scrolled .brand img{height:38px}
+.burger{display:none;width:46px;height:46px;border:1.5px solid var(--line-2);background:transparent;cursor:pointer;position:relative}
+.burger span{position:absolute;left:12px;right:12px;height:1.5px;background:#fff;transition:all .4s var(--ease)}
+.burger span:nth-child(1){top:18px}.burger span:nth-child(2){top:26px}
+body.menu-open .burger span:nth-child(1){top:22px;transform:rotate(45deg)}
+body.menu-open .burger span:nth-child(2){top:22px;transform:rotate(-45deg)}
+.drawer{position:fixed;inset:0;z-index:45;background:var(--bg);padding:100px 24px 40px;display:flex;flex-direction:column;overflow-y:auto;clip-path:inset(0 0 0 100%);visibility:hidden;transition:clip-path .7s var(--ease),visibility 0s .7s}
+body.menu-open .drawer{clip-path:inset(0);visibility:visible;transition:clip-path .7s var(--ease)}
+body.menu-open header.nav{background:transparent;backdrop-filter:none;box-shadow:none}
+.drawer a{font-family:var(--display);font-stretch:110%;font-weight:800;text-transform:uppercase;font-size:24px;padding:11px 0;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}
+.drawer a small{font-family:var(--mono);font-size:12px;color:var(--red);font-weight:400}
+.drawer .btn{margin-top:26px;align-self:flex-start;font-family:var(--sans);font-size:15px;text-transform:none;border:0;padding:16px 26px}
+
+/* hero */
+.hero{position:relative;min-height:100svh;display:flex;align-items:center;padding:150px 0 110px;overflow:hidden;isolation:isolate}
+.hero-bg{position:absolute;inset:-10% 0 0;background:url(assets/hero.webp) center/cover no-repeat;z-index:-3;will-change:transform;opacity:.85}
+.hero::before{content:"";position:absolute;inset:0;z-index:-2;background:radial-gradient(55% 60% at 80% 35%,rgba(225,29,36,.28),transparent 65%),linear-gradient(90deg,rgba(10,11,13,.95) 0%,rgba(10,11,13,.6) 55%,rgba(10,11,13,.3) 100%),linear-gradient(0deg,var(--bg) 0%,transparent 35%)}
+.scan{position:absolute;inset:0;z-index:-1;background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);background-size:80px 80px;mask-image:linear-gradient(90deg,transparent,#000 40%,#000 70%,transparent);-webkit-mask-image:linear-gradient(90deg,transparent,#000 40%,#000 70%,transparent)}
+.scan::after{content:"";position:absolute;left:0;right:0;height:140px;background:linear-gradient(180deg,transparent,rgba(225,29,36,.10),transparent);animation:sweep 6s linear infinite}
+@keyframes sweep{from{top:-140px}to{top:100%}}
+.hero .wrap{display:grid;grid-template-columns:1.4fr .6fr;gap:50px;align-items:center}
+.hero h1{font-size:clamp(36px,4.6vw,66px);margin:26px 0 30px;line-height:.95}
+.hero h1 .ln{display:block;overflow:hidden;padding-bottom:.04em}
+.hero h1 .ln>span{display:inline-block;transform:translateY(105%);transition:transform 1.2s var(--ease)}
+.ready .hero h1 .ln>span{transform:none}
+.ready .hero h1 .ln:nth-child(2)>span{transition-delay:.12s}
+.ready .hero h1 .ln:nth-child(3)>span{transition-delay:.24s}
+.ready .hero h1 .ln:nth-child(4)>span{transition-delay:.36s}
+.hero .lead{color:rgba(255,255,255,.75);font-size:clamp(16px,1.45vw,20px)}
+.hero-checks{list-style:none;margin:30px 0 40px;display:grid;gap:12px}
+.hero-checks li{display:flex;gap:12px;align-items:center;font-weight:600;color:#fff}
+.hero-checks li i{width:22px;height:22px;flex:none;display:grid;place-items:center;background:rgba(225,29,36,.15);border:1px solid rgba(225,29,36,.5);color:var(--red-2)}
+.hero-checks svg{width:13px;height:13px}
+.hero-actions{display:flex;flex-wrap:wrap;gap:14px}
+.hero-card{position:relative;align-self:end;border:1px solid var(--line-2);background:rgba(17,19,23,.6);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);padding:12px;opacity:0;transform:translateY(30px);transition:opacity 1s var(--ease) .5s,transform 1.1s var(--ease) .5s}
+.ready .hero-card{opacity:1;transform:none}
+.hero-card .img{aspect-ratio:4/3;overflow:hidden;position:relative}
+.hero-card img{width:100%;height:100%;object-fit:cover;filter:saturate(.9)}
+.hero-card .img::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 50%,rgba(10,11,13,.8))}
+.hero-card .badge{position:absolute;left:24px;bottom:24px;z-index:2;font-family:var(--mono);font-size:11.5px;letter-spacing:.1em;display:flex;align-items:center;gap:8px}
+.hero-card .badge::before{content:"";width:7px;height:7px;border-radius:50%;background:#2bd576;animation:pulse 2s infinite}
+.hero-card .meta{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);margin-top:12px}
+.hero-card .meta div{background:var(--bg-2);padding:14px}
+.hero-card .meta b{display:block;font-family:var(--display);font-stretch:118%;font-weight:800;font-size:28px;line-height:1}
+.hero-card .meta b em{font-style:normal;color:var(--red)}
+.hero-card .meta span{font-size:12px;color:var(--muted)}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(43,213,118,.6)}70%{box-shadow:0 0 0 10px rgba(43,213,118,0)}100%{box-shadow:0 0 0 0 rgba(43,213,118,0)}}
+
+/* stats */
+.stats{border-top:1px solid var(--line);border-bottom:1px solid var(--line);background:var(--bg-2)}
+.stats .wrap{display:grid;grid-template-columns:repeat(4,1fr)}
+.stat{padding:38px 28px;border-left:1px solid var(--line)}
+.stat:last-child{border-right:1px solid var(--line)}
+.stat b{display:block;font-family:var(--display);font-stretch:118%;font-weight:800;font-size:clamp(40px,4.6vw,64px);line-height:1;letter-spacing:-.03em}
+.stat b em{font-style:normal;color:var(--red)}
+.stat>span{display:block;margin-top:10px;color:var(--muted);font-size:14px;max-width:24ch}
+
+section{position:relative;scroll-margin-top:70px}
+.pad{padding:clamp(80px,11vw,140px) 0}
+.head{display:grid;grid-template-columns:1.15fr .85fr;gap:40px;align-items:end;margin-bottom:60px}
+.head h2{margin-top:18px}
+.light{background:var(--light);color:var(--ink)}
+.light .tagline{color:var(--red)}
+.light .lead{color:var(--ink-muted)}
+
+/* who */
+.who-wrap{display:grid;grid-template-columns:1fr 1fr;gap:22px}
+.photo{position:relative;overflow:hidden;min-height:420px}
+.photo img{position:absolute;left:0;top:-8%;width:100%;height:116%;object-fit:cover;will-change:transform}
+.photo::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 45%,rgba(10,11,13,.85))}
+.photo .cap{position:absolute;left:24px;right:24px;bottom:22px;z-index:2;display:flex;justify-content:space-between;align-items:flex-end;gap:16px}
+.photo .cap b{font-family:var(--display);font-stretch:118%;font-weight:900;font-size:clamp(48px,5vw,72px);line-height:.9}
+.photo .cap b em{font-style:normal;color:var(--red)}
+.photo .cap span{font-family:var(--mono);font-size:11.5px;letter-spacing:.1em;color:rgba(255,255,255,.75);text-align:right;max-width:22ch}
+.photo .corner{position:absolute;top:16px;left:16px;width:34px;height:34px;border-left:2px solid var(--red);border-top:2px solid var(--red);z-index:2}
+.who-grid{display:grid;gap:1px;background:var(--line);border:1px solid var(--line)}
+.who{background:var(--bg);padding:30px 30px 32px;position:relative;overflow:hidden;transition:background .5s}
+.who:hover{background:var(--bg-2)}
+.who .k{font-family:var(--mono);font-size:12px;color:var(--red-2);letter-spacing:.12em}
+.who h3{font-size:24px;margin:14px 0 10px}
+.who p{color:var(--muted);font-size:15.5px}
+.who::after{content:"";position:absolute;left:0;bottom:0;height:2px;width:100%;background:var(--red);transform:scaleX(0);transform-origin:left;transition:transform .7s var(--ease)}
+.who:hover::after{transform:scaleX(1)}
+.quote{margin-top:22px;display:grid;grid-template-columns:auto 1fr;gap:28px;align-items:center;padding:40px;border:1px solid var(--line);background:linear-gradient(110deg,rgba(225,29,36,.12),transparent 50%)}
+.quote .qm{font-family:var(--display);font-weight:900;font-size:120px;line-height:.6;color:var(--red)}
+.quote p{font-family:var(--display);font-stretch:100%;font-weight:500;font-size:clamp(20px,2.2vw,28px);line-height:1.3;letter-spacing:-.01em}
+.quote cite{display:block;margin-top:14px;font-style:normal;font-family:var(--mono);font-size:12.5px;color:var(--muted);letter-spacing:.08em}
+
+/* differentiators */
+.light h2 .out{-webkit-text-stroke:1.5px var(--ink)}
+.cap-wrap{display:flex;flex-wrap:wrap;gap:10px;margin:0 0 56px}
+.chip{font-family:var(--mono);font-size:12.5px;padding:10px 14px;border:1px solid var(--ink-line);background:#fff;transition:all .35s var(--ease)}
+.chip:hover{border-color:var(--red);color:var(--red)}
+.d-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:20px}
+.d-card{background:#fff;border:1px solid var(--ink-line);padding:38px;position:relative;transition:transform .6s var(--ease),box-shadow .6s var(--ease)}
+.d-card:hover{transform:translateY(-6px);box-shadow:0 30px 60px -30px rgba(0,0,0,.25)}
+.d-card .no{position:absolute;right:30px;top:26px;font-family:var(--display);font-stretch:118%;font-weight:800;font-size:56px;color:#ecece8;line-height:1}
+.d-card .ic{width:54px;height:54px;background:var(--ink);color:#fff;display:grid;place-items:center;margin-bottom:26px}
+.d-card .ic svg{width:26px;height:26px}
+.d-card h3{font-size:24px;margin-bottom:12px;max-width:18ch}
+.d-card p{color:var(--ink-muted)}
+.flow{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+.flow span{font-size:12.5px;font-weight:700;padding:8px 12px;background:var(--light);border-left:2px solid var(--red)}
+.sectors{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-top:20px}
+.sector{position:relative;aspect-ratio:4/3;overflow:hidden;background:#000}
+.sector img{width:100%;height:100%;object-fit:cover;transition:transform 1.2s var(--ease),filter .6s;filter:grayscale(.35)}
+.sector:hover img{transform:scale(1.07);filter:none}
+.sector::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 40%,rgba(10,11,13,.9))}
+.sector div{position:absolute;left:22px;right:22px;bottom:20px;z-index:2;color:#fff}
+.sector small{font-family:var(--mono);font-size:11px;letter-spacing:.12em;color:var(--red-2)}
+.sector h4{font-family:var(--display);font-stretch:110%;font-weight:800;text-transform:uppercase;font-size:20px;margin-top:4px}
+
+/* 360 */
+.integ{overflow:hidden}
+.integ::before{content:"";position:absolute;inset:0;background:url(assets/datacenter.webp) center/cover;opacity:.08;filter:grayscale(1)}
+.integ .wrap{position:relative;display:grid;grid-template-columns:1fr 1fr;gap:clamp(40px,6vw,90px);align-items:center}
+.orbit{position:relative;aspect-ratio:1;width:100%;max-width:560px;justify-self:center}
+.orbit svg.rings{position:absolute;inset:0;width:100%;height:100%}
+.orbit .o1{fill:none;stroke:var(--line-2);stroke-width:1}
+.orbit .o2{fill:none;stroke:rgba(225,29,36,.55);stroke-width:1.2;stroke-dasharray:3 9;transform-origin:50% 50%;animation:spin 40s linear infinite}
+.orbit .o3{fill:none;stroke:var(--line);stroke-width:1}
+.orbit .pulse{fill:var(--red);filter:drop-shadow(0 0 6px var(--red))}
+.core{position:absolute;left:50%;top:50%;width:36%;aspect-ratio:1;transform:translate(-50%,-50%);border-radius:50%;background:radial-gradient(circle at 50% 35%,#2a1012,#0f0f11 70%);border:1px solid rgba(225,29,36,.5);display:grid;place-items:center;text-align:center;box-shadow:0 0 80px -10px rgba(225,29,36,.45),inset 0 0 40px rgba(225,29,36,.15);transition:box-shadow .5s,border-color .5s,transform .6s var(--ease)}
+.core.on{border-color:var(--red-2);box-shadow:0 0 120px -6px rgba(225,29,36,.75),inset 0 0 50px rgba(225,29,36,.3);transform:translate(-50%,-50%) scale(1.05)}
+.core b{display:block;font-family:var(--display);font-stretch:118%;font-weight:900;font-size:clamp(34px,4vw,52px);line-height:1}
+.core b sup{color:var(--red);font-size:.55em}
+.core small{display:block;font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;color:var(--muted);margin-top:6px;padding:0 10px}
+.node{position:absolute;width:31%;transform:translate(-50%,-50%);background:var(--bg-3);border:1px solid var(--line-2);padding:14px 14px 16px;cursor:pointer;transition:border-color .4s,background .4s,transform .5s var(--ease)}
+.node .ni{width:34px;height:34px;background:var(--red);display:grid;place-items:center;margin-bottom:10px}
+.node .ni svg{width:18px;height:18px;color:#fff}
+.node h4{font-family:var(--display);font-stretch:110%;font-weight:800;text-transform:uppercase;font-size:clamp(12px,1.15vw,15px);line-height:1.1}
+.node p{font-size:12px;color:var(--muted);margin-top:6px;line-height:1.4}
+.node:hover,.node.on{border-color:var(--red);background:#1d1012;transform:translate(-50%,-50%) scale(1.05)}
+.n1{left:50%;top:10%}.n2{left:13%;top:76%}.n3{left:87%;top:76%}
+.i-list{margin-top:34px;border-top:1px solid var(--line)}
+.i-row{display:grid;grid-template-columns:44px 1fr;gap:18px;padding:22px 0;border-bottom:1px solid var(--line);cursor:pointer;transition:padding .4s var(--ease)}
+.i-row .idx{font-family:var(--mono);font-size:13px;color:var(--dim);padding-top:4px}
+.i-row h4{font-family:var(--display);font-stretch:110%;font-weight:800;text-transform:uppercase;font-size:20px;transition:color .3s}
+.i-row p{color:var(--muted);font-size:15px;max-height:0;overflow:hidden;opacity:0;transition:max-height .6s var(--ease),opacity .4s,margin .4s}
+.i-row.on{padding-left:10px}
+.i-row.on h4,.i-row.on .idx{color:var(--red-2)}
+.i-row.on p{max-height:120px;opacity:1;margin-top:8px}
+
+/* impact */
+.impact{border-top:1px solid var(--line);border-bottom:1px solid var(--line);overflow:hidden;isolation:isolate}
+.impact .bgimg{position:absolute;inset:-10% 0;background:url(assets/servers.webp) center/cover;z-index:-2;will-change:transform}
+.impact::before{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(180deg,rgba(10,11,13,.92),rgba(17,19,23,.97) 40%)}
+.imp-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line)}
+.imp{background:rgba(17,19,23,.92);padding:34px 30px 36px;transition:background .5s}
+.imp:hover{background:var(--bg-3)}
+.imp .top{display:flex;justify-content:space-between;align-items:center;margin-bottom:30px}
+.imp .top i{width:48px;height:48px;border:1px solid var(--line-2);display:grid;place-items:center;color:var(--red-2);transition:all .4s}
+.imp:hover .top i{background:var(--red);border-color:var(--red);color:#fff}
+.imp .top i svg{width:22px;height:22px}
+.imp .top span{font-family:var(--mono);font-size:12px;color:var(--dim)}
+.imp h3{font-size:22px;margin-bottom:10px}
+.imp p{color:var(--muted);font-size:15px}
+.imp p em{font-style:normal;color:#fff;border-bottom:1px solid var(--red)}
+
+/* approach */
+.app-wrap{display:grid;grid-template-columns:.8fr 1.2fr;gap:clamp(30px,5vw,70px);align-items:start}
+.app-photo{position:sticky;top:110px;min-height:560px}
+.steps{position:relative}
+.steps::before{content:"";position:absolute;left:27px;top:0;bottom:0;width:1px;background:var(--line-2)}
+.steps .fill{position:absolute;left:27px;top:0;width:1px;height:0;background:var(--red);box-shadow:0 0 10px var(--red)}
+.step{display:grid;grid-template-columns:56px 1fr;gap:24px;padding:28px 0;border-bottom:1px solid var(--line);align-items:start;position:relative}
+.step .dot{width:56px;height:56px;border:1px solid var(--line-2);background:var(--bg);display:grid;place-items:center;font-family:var(--mono);font-size:13px;position:relative;z-index:1;transition:all .5s}
+.step.lit .dot{background:var(--red);border-color:var(--red);box-shadow:0 0 30px -4px var(--red)}
+.step h3{font-size:clamp(20px,2vw,26px);padding-top:6px}
+.step p{color:var(--muted);margin-top:8px}
+.qa-head{margin-top:clamp(80px,9vw,120px);margin-bottom:40px}
+.qa{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+.qa-c{border:1px solid var(--line);padding:28px 24px;background:linear-gradient(180deg,var(--bg-2),var(--bg));transition:border-color .4s,transform .6s var(--ease)}
+.qa-c:hover{border-color:rgba(225,29,36,.6);transform:translateY(-6px)}
+.qa-c .n{font-family:var(--display);font-stretch:118%;font-weight:900;font-size:44px;color:transparent;-webkit-text-stroke:1px rgba(225,29,36,.8);line-height:1}
+.qa-c h4{font-family:var(--display);font-stretch:110%;font-weight:800;text-transform:uppercase;font-size:17px;margin:18px 0 8px}
+.qa-c p{color:var(--muted);font-size:14.5px}
+
+/* banner */
+.banner{position:relative;height:clamp(320px,46vw,520px);overflow:hidden;display:flex;align-items:center;isolation:isolate}
+.banner .bgimg{position:absolute;inset:-15% 0;background:url(assets/tower.webp) center/cover;z-index:-2;will-change:transform}
+.banner::before{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(90deg,rgba(10,11,13,.92),rgba(10,11,13,.35)),radial-gradient(50% 80% at 90% 50%,rgba(225,29,36,.35),transparent 70%)}
+.banner p{font-family:var(--display);font-stretch:118%;font-weight:900;text-transform:uppercase;font-size:clamp(32px,5.4vw,80px);line-height:.95;letter-spacing:-.02em;max-width:14ch}
+.banner small{display:block;font-family:var(--mono);font-size:12px;letter-spacing:.14em;color:rgba(255,255,255,.7);margin-top:22px}
+
+/* services */
+.s-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px}
+.svc{background:#fff;border:1px solid var(--ink-line);display:flex;flex-direction:column;overflow:hidden;transition:transform .6s var(--ease),box-shadow .6s var(--ease)}
+.svc:hover{transform:translateY(-8px);box-shadow:0 30px 60px -28px rgba(0,0,0,.3)}
+.svc .img{aspect-ratio:4/3;overflow:hidden;position:relative;background:#000}
+.svc .img img{width:100%;height:100%;object-fit:cover;filter:grayscale(1) contrast(1.05);transition:filter .7s,transform 1.2s var(--ease)}
+.svc:hover .img img{filter:none;transform:scale(1.06)}
+.svc .img i{position:absolute;left:18px;bottom:-26px;width:54px;height:54px;background:var(--red);color:#fff;display:grid;place-items:center;z-index:2}
+.svc .img i svg{width:26px;height:26px}
+.svc .img{overflow:visible}
+.svc .img .clip{position:absolute;inset:0;overflow:hidden}
+.svc .body{padding:44px 24px 28px;flex:1;display:flex;flex-direction:column}
+.svc .n{font-family:var(--mono);font-size:12px;color:var(--red)}
+.svc h3{font-size:23px;margin:10px 0 10px;line-height:1.05}
+.svc p{font-size:14.5px;color:var(--ink-muted)}
+
+/* pillars */
+.p-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:14px}
+.pil{border:1px solid var(--line);padding:28px 22px 30px;background:var(--bg-2);transition:transform .6s var(--ease),border-color .4s}
+.pil:hover{transform:translateY(-8px);border-color:rgba(225,29,36,.6)}
+.pil .bar{height:3px;background:var(--line-2);margin-bottom:26px;position:relative;overflow:hidden}
+.pil .bar::after{content:"";position:absolute;inset:0;background:var(--red);transform:scaleX(.15);transform-origin:left;transition:transform 1.2s var(--ease) .3s}
+.pil.in .bar::after{transform:scaleX(1)}
+.pil .n{font-family:var(--mono);font-size:12px;color:var(--red-2)}
+.pil h4{font-family:var(--display);font-stretch:110%;font-weight:800;text-transform:uppercase;font-size:19px;margin:10px 0;line-height:1.1}
+.pil p{color:var(--muted);font-size:14px}
+.motto{margin-top:50px;display:flex;flex-wrap:wrap;gap:16px 40px;font-family:var(--display);font-stretch:118%;font-weight:900;text-transform:uppercase;font-size:clamp(24px,3.4vw,46px);line-height:1}
+.motto span:nth-child(2){color:transparent;-webkit-text-stroke:1.5px var(--red)}
+
+/* location */
+.loc-top{display:grid;grid-template-columns:1fr 1fr;gap:22px}
+.loc-top .photo{min-height:460px}
+.loc-cards{display:grid;gap:16px;align-content:start}
+.lc{border:1px solid var(--line);padding:26px;display:grid;grid-template-columns:48px 1fr;gap:18px;background:var(--bg-2)}
+.lc i{width:48px;height:48px;background:var(--red);display:grid;place-items:center}
+.lc i svg{width:22px;height:22px}
+.lc h4{font-family:var(--display);font-stretch:110%;font-weight:800;text-transform:uppercase;font-size:19px;margin-bottom:6px}
+.lc p{color:var(--muted);font-size:14.5px}
+.usmap{background:var(--light);padding:14px;border:1px solid var(--line)}
+.usmap img{mix-blend-mode:multiply}
+.gmap{margin-top:22px;position:relative;border:1px solid var(--line-2);height:clamp(340px,40vw,460px);overflow:hidden;background:var(--bg-2)}
+.gmap iframe{width:100%;height:100%;border:0;filter:grayscale(.85) contrast(1.05)}
+.gmap .addr{position:absolute;right:20px;top:20px;background:rgba(10,11,13,.94);border:1px solid var(--line-2);padding:20px 22px;max-width:300px;backdrop-filter:blur(8px)}
+.gmap .addr::before{content:"";position:absolute;top:-1px;left:-1px;width:44px;height:2px;background:var(--red)}
+.gmap .addr small{font-family:var(--mono);font-size:11px;letter-spacing:.12em;color:var(--red-2)}
+.gmap .addr b{display:block;font-family:var(--display);font-stretch:110%;font-weight:800;text-transform:uppercase;font-size:18px;margin:6px 0 4px}
+.gmap .addr p{color:var(--muted);font-size:14px}
+.gmap .addr a{display:inline-flex;align-items:center;gap:8px;margin-top:12px;font-weight:700;font-size:13.5px;color:#fff;border-bottom:1px solid var(--red)}
+
+/* contact */
+.contact{background:var(--bg-2);border-top:1px solid var(--line)}
+.contact .wrap{display:grid;grid-template-columns:.9fr 1.1fr;gap:clamp(40px,6vw,90px)}
+.info{margin-top:40px;border-top:1px solid var(--line)}
+.info div{display:grid;grid-template-columns:110px 1fr;gap:20px;padding:20px 0;border-bottom:1px solid var(--line)}
+.info dt{font-family:var(--mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--dim);padding-top:3px}
+.info dd{font-weight:600;font-size:16.5px}
+.info a:hover{color:var(--red-2)}
+form{border:1px solid var(--line-2);background:var(--bg);padding:clamp(26px,4vw,44px);display:grid;grid-template-columns:1fr 1fr;gap:18px;align-content:start;position:relative}
+form::before{content:"";position:absolute;top:-1px;left:-1px;width:60px;height:3px;background:var(--red)}
+form h3{grid-column:1/-1;font-size:28px;margin-bottom:6px}
+.field{display:flex;flex-direction:column;gap:8px}
+.field.full{grid-column:1/-1}
+label{font-family:var(--mono);font-size:11.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+input,textarea{background:var(--bg-2);border:1px solid var(--line-2);padding:15px 16px;outline:none;transition:border-color .3s,box-shadow .3s;width:100%;border-radius:0}
+input:focus,textarea:focus{border-color:var(--red);box-shadow:0 0 0 3px rgba(225,29,36,.18)}
+textarea{min-height:130px;resize:vertical}
+form .btn{grid-column:1/-1;justify-content:center}
+.sent{grid-column:1/-1;display:none;padding:14px 16px;border:1px solid rgba(43,213,118,.4);background:rgba(43,213,118,.08);color:#b9f3cf;font-weight:600}
+form.ok .sent{display:block}
+.follow{display:inline-flex;align-items:center;gap:12px;margin-top:30px;padding:14px 18px;border:1px solid var(--line-2);font-weight:700;transition:all .4s var(--ease)}
+.follow svg{width:20px;height:20px}
+.follow:hover{background:#0a66c2;border-color:#0a66c2}
+
+footer{border-top:1px solid var(--line);padding:70px 0 30px;color:var(--muted);font-size:14.5px;overflow:hidden}
+.f-top{display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:40px;padding-bottom:50px}
+.f-top img{height:46px;width:auto;margin-bottom:18px}
+.f-top h5{font-family:var(--mono);font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;color:#fff;margin-bottom:16px;font-weight:400}
+.f-top a{display:block;padding:4px 0;transition:color .3s}
+.f-top a:hover{color:var(--red-2)}
+.mega{font-family:var(--display);font-stretch:125%;font-weight:900;text-transform:uppercase;font-size:clamp(70px,17vw,250px);line-height:.8;letter-spacing:-.04em;color:transparent;-webkit-text-stroke:1px rgba(255,255,255,.1);white-space:nowrap;margin:10px 0 30px;user-select:none}
+.mega span{-webkit-text-stroke:1px rgba(225,29,36,.5)}
+.f-bot{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;padding-top:24px;border-top:1px solid var(--line);font-size:13px}
+.credits{margin-top:18px;font-size:11.5px;color:var(--dim);line-height:1.6}
+.credits a{text-decoration:underline}
+
+/* reveal */
+.rv{opacity:0;transform:translateY(40px);transition:opacity 1s var(--ease),transform 1.1s var(--ease)}
+.rv.in{opacity:1;transform:none}
+.d1{transition-delay:.08s!important}.d2{transition-delay:.16s!important}.d3{transition-delay:.24s!important}.d4{transition-delay:.32s!important}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}.rv,.hero-card{opacity:1;transform:none}.hero h1 .ln>span{transform:none}}
+
+/* responsive */
+@media (max-width:1240px){ .phone{display:none} }
+@media (max-width:1120px){
+  .menu,.nav-cta{display:none}.burger{display:block}
+  .hero .wrap{grid-template-columns:1fr}
+  .hero-card{max-width:520px}
+  .stats .wrap{grid-template-columns:repeat(2,1fr)}
+  .stat:nth-child(2){border-right:1px solid var(--line)}
+  .stat:nth-child(n+3){border-top:1px solid var(--line)}
+  .head{grid-template-columns:1fr}
+  .who-wrap,.integ .wrap,.loc-top,.contact .wrap,.app-wrap{grid-template-columns:1fr}
+  .app-photo{position:relative;top:0;min-height:340px}
+  .imp-grid{grid-template-columns:repeat(2,1fr)}
+  .s-grid{grid-template-columns:repeat(2,1fr)}
+  .p-grid{grid-template-columns:repeat(3,1fr)}
+  .qa{grid-template-columns:repeat(2,1fr)}
+  .f-top{grid-template-columns:1fr 1fr}
+}
+@media (max-width:760px){
+  .wrap{width:calc(100% - 32px)}
+  .hero{padding:120px 0 80px}
+  .stat{padding:26px 18px}
+  .d-grid,.imp-grid,.s-grid,.qa,.sectors,.p-grid{grid-template-columns:1fr}
+  .pil h4{overflow-wrap:anywhere}
+  .photo,.loc-top .photo{min-height:320px}
+  .quote{grid-template-columns:1fr;padding:28px;gap:10px}
+  .quote .qm{font-size:80px}
+  .d-card{padding:28px}
+  .node{width:36%;padding:10px}
+  .node p{display:none}
+  .n2{left:16%}.n3{left:84%}
+  form{grid-template-columns:1fr}
+  .info div{grid-template-columns:1fr;gap:4px}
+  .f-top{grid-template-columns:1fr}
+  .brand img{height:36px}
+  .gmap{height:420px}
+  .gmap .addr{left:12px;right:12px;top:auto;bottom:12px;max-width:none}
+}
+</style>
+</head>
+<body class="loading">
+
+<div id="loader" aria-hidden="true">
+  <div class="ring">
+    <div class="ticks"></div>
+    <svg viewBox="0 0 150 150"><circle class="trk" cx="75" cy="75" r="70"/><circle class="arc" cx="75" cy="75" r="70"/></svg>
+    <div class="deg"><span><span id="ldv">0</span><sup>°</sup></span></div>
+    <div class="ld-cap">SYSTEMS INITIALIZING</div>
+  </div>
+</div>
+
+<div class="progress"></div>
+
+<header class="nav">
+  <div class="wrap">
+    <a href="#top" class="brand" aria-label="SLA360 home"><img src="assets/logo-light.png" alt="Streamline Automation, Commissioning & Energy Services"></a>
+    <nav class="menu" aria-label="Main">
+      <a href="#top" data-spy="top">Home</a>
+      <a href="#who" data-spy="who">Who We Are</a>
+      <a href="#diff" data-spy="diff">SLA Differentiators</a>
+      <div class="more">
+        <button type="button" aria-expanded="false" aria-haspopup="true">More <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg></button>
+        <div class="dd" role="menu">
+          <a href="#integration" data-spy="integration">360 Integration <small>04</small></a>
+          <a href="#impact" data-spy="impact">Lasting Impact <small>05</small></a>
+          <a href="#approach" data-spy="approach">QAQC &amp; Project Approach <small>06</small></a>
+          <a href="#services" data-spy="services">Services <small>07</small></a>
+          <a href="#pillars" data-spy="pillars">Team Success <small>08</small></a>
+          <a href="#location" data-spy="location">Location <small>09</small></a>
+          <a href="#contact" data-spy="contact">Contact <small>10</small></a>
+          <hr>
+          <a href="https://www.linkedin.com/search/results/companies/?keywords=SLA360" target="_blank" rel="noopener" class="li-link">Follow Us <small>LinkedIn ↗</small></a>
+        </div>
+      </div>
+    </nav>
+    <div class="nav-r">
+      <a class="phone" href="tel:+16024386061">(602) 438-6061</a>
+      <a href="#contact" class="btn btn-red nav-cta">Contact Us</a>
+      <button class="burger" aria-label="Open menu"><span></span><span></span></button>
+    </div>
+  </div>
+</header>
+
+<div class="drawer">
+  <a href="#top">Home <small>01</small></a>
+  <a href="#who">Who We Are <small>02</small></a>
+  <a href="#diff">SLA Differentiators <small>03</small></a>
+  <a href="#integration">360 Integration <small>04</small></a>
+  <a href="#impact">Lasting Impact <small>05</small></a>
+  <a href="#approach">QAQC &amp; Project Approach <small>06</small></a>
+  <a href="#services">Services <small>07</small></a>
+  <a href="#pillars">Team Success <small>08</small></a>
+  <a href="#location">Location <small>09</small></a>
+  <a href="#contact">Contact <small>10</small></a>
+  <a href="https://www.linkedin.com/search/results/companies/?keywords=SLA360" target="_blank" rel="noopener" class="li-link">Follow Us <small>LinkedIn ↗</small></a>
+  <a href="#contact" class="btn btn-red">Contact Us</a>
+</div>
+
+<main id="top">
+<section class="hero">
+  <div class="hero-bg" data-speed="0.25"></div>
+  <div class="scan"></div>
+  <div class="wrap">
+    <div>
+      <span class="tagline">Commissioning · Controls · MSI · Energy</span>
+      <h1>
+        <span class="ln"><span>Systems that talk.</span></span>
+        <span class="ln"><span class="out">Data you trust.</span></span>
+        <span class="ln"><span>Performance</span></span>
+        <span class="ln"><span class="r">that lasts.</span></span>
+      </h1>
+      <p class="lead">Owner-side integration of commissioning, controls and MSI that ensures buildings operate as one.</p>
+      <ul class="hero-checks">
+        <li><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="m5 12 5 5L20 7"/></svg></i>Embedded QAQC from kickoff to handoff</li>
+        <li><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="m5 12 5 5L20 7"/></svg></i>Enterprise integration and Division 25 governance</li>
+        <li><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="m5 12 5 5L20 7"/></svg></i>Functional verification under real operating conditions</li>
+      </ul>
+      <div class="hero-actions">
+        <a href="#contact" class="btn btn-red">Start a Project <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+        <a href="#integration" class="btn btn-line">See 360° Integration</a>
+      </div>
+    </div>
+    <aside class="hero-card">
+      <div class="img"><img src="assets/panel.webp" alt="Controls panel terminal wiring"><span class="badge">FIELD VERIFIED · TEMPE, AZ</span></div>
+      <div class="meta">
+        <div><b>20<em>+</em></b><span>Years of integrated services</span></div>
+        <div><b>12</b><span>Arizona-based specialists</span></div>
+      </div>
+    </aside>
+  </div>
+</section>
+
+<div class="stats">
+  <div class="wrap">
+    <div class="stat rv"><b><span data-count="20">0</span><em>+</em></b><span>Years of integrated building performance services</span></div>
+    <div class="stat rv d1"><b><span data-count="100">0</span></b><span>Years of collective commissioning &amp; integration expertise</span></div>
+    <div class="stat rv d2"><b><span data-count="12">0</span></b><span>Commissioning &amp; controls specialists in Arizona</span></div>
+    <div class="stat rv d3"><b><span data-count="360">0</span><em>°</em></b><span>Total building integration, design to data</span></div>
+  </div>
+</div>
+
+<!-- WHO WE ARE -->
+<section class="pad" id="who">
+  <div class="wrap">
+    <div class="head">
+      <div class="rv"><span class="tagline">01 / About</span><h2>Who <span class="r">We Are</span></h2><p class="sub">One team. Every system.</p></div>
+      <p class="lead rv d1">We take a holistic approach, blending engineering, commissioning, operations, maintenance and energy management into a seamless strategy.</p>
+    </div>
+    <div class="who-wrap">
+      <figure class="photo rv">
+        <img src="assets/tech.webp" alt="Field technician servicing building mechanical equipment" data-speed="-0.06">
+        <span class="corner"></span>
+        <figcaption class="cap"><b>20<em>+</em></b><span>YEARS OF INTEGRATED BUILDING PERFORMANCE SERVICES</span></figcaption>
+      </figure>
+      <div class="who-grid rv d1">
+        <article class="who"><span class="k">OUR PROCESS</span><h3>Systematic. Transparent.</h3><p>We follow a systematic and comprehensive approach to ensure that all projects are completed on time and within budget. From initial planning to final implementation, we keep our clients informed every step of the way.</p></article>
+        <article class="who"><span class="k">OUR MISSION</span><h3>Reliability built in.</h3><p>Our integrated solutions ensure enhanced reliability, optimized performance and long-term value.</p></article>
+        <article class="who"><span class="k">OUR EXPERTISE</span><h3>20+ Years</h3><p>Integrated building performance services across commissioning, controls, MSI and energy.</p></article>
+      </div>
+    </div>
+    <div class="quote rv">
+      <div class="qm">“</div>
+      <div><p>We take a holistic approach, blending engineering, commissioning, operations, maintenance, and energy management into a seamless strategy.</p><cite>— MARCUS MYERS, CTO</cite></div>
+    </div>
+  </div>
+</section>
+
+<!-- DIFFERENTIATORS -->
+<section class="light pad" id="diff">
+  <div class="wrap">
+    <div class="head">
+      <div class="rv"><span class="tagline">02 / SLA Differentiators</span><h2>Company Overview &amp; <span class="r">Differentiators</span></h2><p class="sub">100 years of collective commissioning, integration &amp; technical expertise.</p></div>
+      <p class="lead rv d1">Our team has seen it all, solved it all and integrated it all for seamless, high-performance results.</p>
+    </div>
+    <div class="cap-wrap rv">
+      <span class="chip">Master Systems Integration (MSI)</span><span class="chip">Automation &amp; Controls</span><span class="chip">Total Building Commissioning</span><span class="chip">Energy Services</span><span class="chip">PLC Programming</span><span class="chip">SCADA</span><span class="chip">Instrumentation</span><span class="chip">UL 508 Panel Fabrication</span><span class="chip">Field Service</span>
+    </div>
+    <div class="d-grid">
+      <article class="d-card rv"><span class="no">01</span><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2 4 5v6c0 5 3.4 9.4 8 11 4.6-1.6 8-6 8-11V5z"/><path d="m9 12 2 2 4-4"/></svg></div><h3>Risk Mitigation &amp; Rock-Solid Reliability</h3><p>We weave commissioning into every phase, spotting and fixing glitches early so you never pay for downstream headaches.</p></article>
+      <article class="d-card rv d1"><span class="no">02</span><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 3v18h18"/><path d="m7 15 4-4 3 3 6-7"/></svg></div><h3>Performance Optimization That Pays</h3><p>From energy use to uptime to maintenance, our data-driven, system-wide tune-up puts dollars back in your budget.</p></article>
+      <article class="d-card rv"><span class="no">03</span><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/></svg></div><h3>Full-Cycle Support</h3><p>From the first drawing to long after occupancy.</p><div class="flow"><span>Design Review</span><span>Implementation &amp; Programming</span><span>Testing &amp; Validation</span><span>Post-occupancy Optimization</span></div></article>
+      <article class="d-card rv d1"><span class="no">04</span><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg></div><h3>Proven Impact Across Sectors</h3><p>Whether it’s a university lab, a cleanroom or a utility plant, our sector-specific expertise scales to meet your toughest challenges.</p></article>
+    </div>
+    <div class="sectors">
+      <figure class="sector rv"><img src="assets/cleanroom.webp" alt="University cleanroom laboratory"><div><small>SECTOR</small><h4>Labs &amp; Cleanrooms</h4></div></figure>
+      <figure class="sector rv d1"><img src="assets/datahall.webp" alt="Mission-critical data hall"><div><small>SECTOR</small><h4>Mission-Critical &amp; Data</h4></div></figure>
+      <figure class="sector rv d2"><img src="assets/plant.webp" alt="Central utility plant chillers"><div><small>SECTOR</small><h4>Utility &amp; Central Plants</h4></div></figure>
+    </div>
+  </div>
+</section>
+
+<!-- 360 INTEGRATION -->
+<section class="integ pad" id="integration">
+  <div class="wrap">
+    <div class="orbit rv">
+      <svg class="rings" viewBox="0 0 400 400">
+        <circle class="o3" cx="200" cy="200" r="196"/>
+        <circle class="o1" cx="200" cy="200" r="150"/>
+        <circle class="o2" cx="200" cy="200" r="150"/>
+        <circle class="pulse" r="4"><animateMotion dur="9s" repeatCount="indefinite" path="M200,50 a150,150 0 1,1 -0.1,0"/></circle>
+        <circle class="pulse" r="3" opacity=".6"><animateMotion dur="9s" begin="-4.5s" repeatCount="indefinite" path="M200,50 a150,150 0 1,1 -0.1,0"/></circle>
+      </svg>
+      <div class="core"><div><b>360<sup>°</sup></b><small>TOTAL BUILDING INTEGRATION</small></div></div>
+      <div class="node n1 on" data-i="0"><div class="ni"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></div><h4>Commissioning</h4><p>Testing, verification, validation &amp; documentation</p></div>
+      <div class="node n2" data-i="1"><div class="ni"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1 7 17M17 7l2.1-2.1"/></svg></div><h4>Controls &amp; Automation</h4><p>Real-time optimization, networking &amp; integration</p></div>
+      <div class="node n3" data-i="2"><div class="ni"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z"/></svg></div><h4>Energy Services</h4><p>Benchmarking, performance, efficiency &amp; savings</p></div>
+    </div>
+    <div>
+      <span class="tagline rv">03 / 360 Integration</span>
+      <h2 class="rv d1" style="margin-top:18px">What 360° Total Building Integration <span class="r">Looks Like</span></h2>
+      <p class="sub rv d2">From design to data.</p>
+      <p class="lead rv d2" style="margin-top:16px">Your complete solution for commissioning, automation, controls, energy and smart building integration.</p>
+      <div class="i-list rv d3">
+        <div class="i-row on" data-i="0"><span class="idx">01</span><div><h4>Commissioning</h4><p>Testing, verification, validation and documentation that proves every system performs as designed.</p></div></div>
+        <div class="i-row" data-i="1"><span class="idx">02</span><div><h4>Controls &amp; Automation</h4><p>Real-time optimization, networking and integration across PLC, SCADA and building automation systems.</p></div></div>
+        <div class="i-row" data-i="2"><span class="idx">03</span><div><h4>Energy Services</h4><p>Benchmarking, performance tracking, efficiency improvements and measurable savings.</p></div></div>
+        <div class="i-row" data-i="3"><span class="idx">04</span><div><h4>Master Systems Integration</h4><p>Systems integration, governance and alignment that ties every platform into one trusted source of data.</p></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- LASTING IMPACT -->
+<section class="impact pad" id="impact">
+  <div class="bgimg" data-speed="0.12"></div>
+  <div class="wrap">
+    <div class="head">
+      <div class="rv"><span class="tagline">04 / Lasting Impact</span><h2>Immediate &amp; <span class="r">Lasting Impact</span></h2><p class="sub">Reduced risk today. Reliable performance tomorrow.</p></div>
+      <p class="lead rv d1">Integrated commissioning, controls and data governance eliminate blind spots and prevent performance drift. Here’s why we deliver peak efficiency, reduced risk and enduring performance.</p>
+    </div>
+    <div class="imp-grid">
+      <article class="imp rv"><div class="top"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="8" cy="7" r="3"/><path d="M2 21v-2a5 5 0 0 1 5-5h2M14 5h7v7h-7z"/><path d="m15.5 8.5 1.5 1.5 3-3"/></svg></i><span>01</span></div><h3>Day One Engagement</h3><p>Embedded from kickoff to hand-off. <em>No blind spots.</em></p></article>
+      <article class="imp rv d1"><div class="top"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4V2h6v2M9 13l2 2 4-4"/></svg></i><span>02</span></div><h3>Integrated Commissioning</h3><p>Real-time QA/QC catches issues <em>before they incur significant expenses.</em></p></article>
+      <article class="imp rv d2"><div class="top"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3M8 11h6M11 8v6"/></svg></i><span>03</span></div><h3>Continuous FDD</h3><p>Automated alerts to <em>identify and resolve inefficiencies</em> at their onset.</p></article>
+      <article class="imp rv"><div class="top"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="14" rx="2"/><path d="M7 21h10M8 9h2M8 13h8M14 9h2"/></svg></i><span>04</span></div><h3>Seamless Controls</h3><p>PLC, SCADA and system metadata <em>seamlessly synchronized.</em></p></article>
+      <article class="imp rv d1"><div class="top"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="5" r="3"/><path d="M12 8v5M5 13h14M5 13v4M12 13v4M19 13v4M3 19l2 2 2-2M10 19l2 2 2-2M17 19l2 2 2-2"/></svg></i><span>05</span></div><h3>System-Wide Optimization</h3><p>Energy, airflow and <em>sequencing tuned as one.</em></p></article>
+      <article class="imp rv d2"><div class="top"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="12" rx="1"/><path d="m7 11 3-3 3 2 4-4M8 21l4-6 4 6"/></svg></i><span>06</span></div><h3>Ongoing Excellence</h3><p>Post-occupancy <em>tuning and staff training</em> keep you ahead.</p></article>
+    </div>
+  </div>
+</section>
+
+<!-- QAQC & PROJECT APPROACH -->
+<section class="pad" id="approach">
+  <div class="wrap">
+    <div class="head">
+      <div class="rv"><span class="tagline">05 / QAQC &amp; Project Approach</span><h2>Project Approach <span class="r">to Success</span></h2><p class="sub">Everyone knows the who, what, why, when &amp; how.</p></div>
+      <p class="lead rv d1">From Day 1 through long after handoff, commissioning, automation and controls run in lockstep with full transparency.</p>
+    </div>
+    <div class="app-wrap">
+      <figure class="photo app-photo rv">
+        <img src="assets/electrician.webp" alt="Technician testing an electrical panel on site" data-speed="-0.05">
+        <span class="corner"></span>
+        <figcaption class="cap"><b style="font-size:clamp(28px,3vw,40px)">Kickoff <em>→</em> Handoff</b><span>QA/QC EMBEDDED IN EVERY PHASE</span></figcaption>
+      </figure>
+      <div class="steps">
+        <div class="fill"></div>
+        <div class="step"><span class="dot">01</span><div><h3>Kickoff &amp; Pre-Planning</h3><p>Align on clear objectives, detailed scopes and operational sequences. Everyone knows the “Who, What, Why, When and How” from Day 1.</p></div></div>
+        <div class="step"><span class="dot">02</span><div><h3>Integrated Execution</h3><p>Commissioning, automation and controls run in lockstep. QA/QC, FDD monitoring and system-wide testing occur side by side to catch gaps before they grow, with full transparency within the teams.</p></div></div>
+        <div class="step"><span class="dot">03</span><div><h3>Real-Time Transparency</h3><p>Live schedules, dashboards and precise records keep you plugged in: no surprises, no guesswork, because we believe in full team collaboration.</p></div></div>
+        <div class="step"><span class="dot">04</span><div><h3>Proactive Issue Resolution</h3><p>Targeted punch lists and on-the-spot corrections ensure immediate remediation and uninterrupted progress.</p></div></div>
+        <div class="step"><span class="dot">05</span><div><h3>Performance Handoff &amp; Beyond</h3><p>Post-occupancy tuning, staff training and clear KPIs deliver sustained efficiency and long-term ROI.</p></div></div>
+      </div>
+    </div>
+
+    <div class="qa-head rv"><h2>QAQC <span class="r">Process</span></h2><p class="sub">Four checkpoints. Zero surprises.</p></div>
+    <div class="qa">
+      <div class="qa-c rv"><span class="n">01</span><h4>Strategic Pre-Planning</h4><p>Defined objectives, comprehensive scope and operational stakeholder alignment.</p></div>
+      <div class="qa-c rv d1"><span class="n">02</span><h4>Transparent Documentation</h4><p>Real-time scheduling, progress tracking and precise record management.</p></div>
+      <div class="qa-c rv d2"><span class="n">03</span><h4>Integrated Verification &amp; Validation</h4><p>Thorough testing to fine-tune performance and efficiency.</p></div>
+      <div class="qa-c rv d3"><span class="n">04</span><h4>Proactive Issue Resolution</h4><p>Targeted punch lists, rapid remediation and smooth project hand-off.</p></div>
+    </div>
+  </div>
+</section>
+
+<div class="banner">
+  <div class="bgimg" data-speed="0.18"></div>
+  <div class="wrap rv"><p>Systems that talk. <span class="r">Data you trust.</span></p><small>OWNER-SIDE INTEGRATION · BUILDINGS THAT OPERATE AS ONE</small></div>
+</div>
+
+<!-- SERVICES -->
+<section class="light pad" id="services">
+  <div class="wrap">
+    <div class="head">
+      <div class="rv"><span class="tagline">06 / Services</span><h2>Integrated <span class="r">Services</span></h2><p class="sub">Four disciplines. One outcome.</p></div>
+      <p class="lead rv d1">Delivered together under one owner-side team, so nothing falls between the cracks.</p>
+    </div>
+    <div class="s-grid">
+      <article class="svc rv"><div class="img"><div class="clip"><img src="assets/panel.webp" alt="Control panel terminal wiring"></div><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1 7 17M17 7l2.1-2.1"/></svg></i></div><div class="body"><span class="n">/01</span><h3>Controls &amp; Automation</h3><p>Design · Install · Program · Integrate · Optimize</p></div></article>
+      <article class="svc rv d1"><div class="img"><div class="clip"><img src="assets/rooftop.webp" alt="Rooftop HVAC equipment"></div><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z"/></svg></i></div><div class="body"><span class="n">/02</span><h3>Energy Services</h3><p>Benchmarking, performance, efficiency &amp; savings</p></div></article>
+      <article class="svc rv d2"><div class="img"><div class="clip"><img src="assets/electrician.webp" alt="Technician verifying an electrical installation"></div><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="10.5" cy="10.5" r="7"/><path d="m21 21-5.5-5.5M7.5 10.5l2 2 4-4"/></svg></i></div><div class="body"><span class="n">/03</span><h3>Commissioning</h3><p>Testing, verification &amp; documentation</p></div></article>
+      <article class="svc rv d3"><div class="img"><div class="clip"><img src="assets/datacenter.webp" alt="Networked data center systems"></div><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><circle cx="12" cy="3" r="1.6"/><circle cx="12" cy="21" r="1.6"/><circle cx="3.5" cy="7.5" r="1.6"/><circle cx="20.5" cy="7.5" r="1.6"/><circle cx="3.5" cy="16.5" r="1.6"/><circle cx="20.5" cy="16.5" r="1.6"/><path d="M12 4.6V9M12 15v4.4M5 8.3l4.4 2.2M14.6 13.5 19 15.7M5 15.7l4.4-2.2M14.6 10.5 19 8.3"/></svg></i></div><div class="body"><span class="n">/04</span><h3>Master Systems Integration</h3><p>Systems integration, governance &amp; alignment</p></div></article>
+    </div>
+  </div>
+</section>
+
+<!-- TEAM SUCCESS -->
+<section class="pad" id="pillars">
+  <div class="wrap">
+    <div class="head">
+      <div class="rv"><span class="tagline">07 / Team Success</span><h2>5 Pillars of Team Success <span class="r">&amp; Why Each Matters</span></h2><p class="sub">Together, we own the outcome!</p></div>
+      <p class="lead rv d1">Great systems are built by great teams. These five principles guide every project we deliver.</p>
+    </div>
+    <div class="p-grid">
+      <div class="pil rv"><div class="bar"></div><span class="n">01</span><h4>Ground Rules</h4><p>Establish clear roles, decision-rights and expectations from Day 1.</p></div>
+      <div class="pil rv d1"><div class="bar"></div><span class="n">02</span><h4>Shared Vision</h4><p>Align on a single, motivating “why” so every decision ties back to your core goals.</p></div>
+      <div class="pil rv d2"><div class="bar"></div><span class="n">03</span><h4>Open Communication</h4><p>Foster constant, two-way dialogue: no surprises, no silos.</p></div>
+      <div class="pil rv d3"><div class="bar"></div><span class="n">04</span><h4>Collective Accountability</h4><p>Set mutual commitments on budgets, schedules and quality, and track them transparently.</p></div>
+      <div class="pil rv d4"><div class="bar"></div><span class="n">05</span><h4>Continuous Improvement</h4><p>Learn from every milestone with real-time data and “Lessons Learned” loops.</p></div>
+    </div>
+    <div class="motto rv"><span>Together, we own the outcome.</span><span>Together, we deliver.</span></div>
+  </div>
+</section>
+
+<!-- LOCATION -->
+<section class="pad" id="location" style="border-top:1px solid var(--line)">
+  <div class="wrap">
+    <div class="head">
+      <div class="rv"><span class="tagline">08 / Location</span><h2>Local to Arizona. <span class="r">Trusted Nationally.</span></h2><p class="sub">Boots on the ground. Reach nationwide.</p></div>
+      <div class="usmap rv d1"><img src="assets/map.webp" alt="Map of SLA360 projects from the Arizona headquarters across the United States"></div>
+    </div>
+    <div class="loc-top">
+      <figure class="photo rv">
+        <img src="assets/tempe.webp" alt="Modern building in Tempe, Arizona" data-speed="-0.05">
+        <span class="corner"></span>
+        <figcaption class="cap"><b style="font-size:clamp(30px,3.4vw,46px)">Tempe, <em>AZ</em></b><span>HEADQUARTERS · 3025 S. 48TH ST.</span></figcaption>
+      </figure>
+      <div class="loc-cards">
+        <div class="lc rv d1"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s7-6.2 7-12a7 7 0 1 0-14 0c0 5.8 7 12 7 12z"/><circle cx="12" cy="10" r="2.5"/></svg></i><div><h4>Local Support</h4><p>Local support is critical: speed, responsiveness and reliability make the difference. With 12 commissioning and controls specialists based in Arizona, we provide unmatched capacity and rapid response. Our boots-on-the-ground expertise ensures issues are resolved quickly, keeping your projects on track.</p></div></div>
+        <div class="lc rv d2"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15 15 0 0 1 0 20M12 2a15 15 0 0 0 0 20"/></svg></i><div><h4>Regional &amp; National Reach</h4><p>Our proven track record spans the Southwest and projects nationwide, delivering complex commissioning and controls solutions with consistency and trusted results. As we continue to grow, we expand our reach and resources, bringing even greater technical depth to every project we support.</p></div></div>
+      </div>
+    </div>
+    <div class="gmap rv">
+      <iframe title="SLA360 office location map" loading="lazy" referrerpolicy="no-referrer-when-downgrade" src="https://maps.google.com/maps?q=3025%20S%2048th%20St%20Suite%20103%2C%20Tempe%2C%20AZ%2085282&amp;t=m&amp;z=15&amp;ie=UTF8&amp;iwloc=&amp;output=embed"></iframe>
+      <div class="addr"><small>HEADQUARTERS</small><b>SLA360 Tempe</b><p>3025 S. 48th St. Suite 103<br>Tempe, AZ 85282</p><a href="https://www.google.com/maps/dir/?api=1&amp;destination=3025+S+48th+St+Suite+103+Tempe+AZ+85282" target="_blank" rel="noopener">Get directions ↗</a></div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section class="contact pad" id="contact">
+  <div class="wrap">
+    <div>
+      <span class="tagline rv">09 / Contact</span>
+      <h2 class="rv d1" style="margin-top:18px">Contact <span class="r">Us</span></h2>
+      <p class="sub rv d2">Better yet, see us in person!</p>
+      <p class="lead rv d2" style="margin-top:16px">We love our customers, so feel free to visit during normal business hours.</p>
+      <dl class="info rv d3">
+        <div><dt>Address</dt><dd>3025 S. 48th St. Suite 103<br>Tempe, AZ 85282</dd></div>
+        <div><dt>Phone</dt><dd><a href="tel:+16024386061">(602) 438-6061</a></dd></div>
+        <div><dt>Hours</dt><dd>Mon – Fri · 8:00 am – 4:00 pm</dd></div>
+      </dl>
+      <a class="follow li-link rv" href="https://www.linkedin.com/search/results/companies/?keywords=SLA360" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.45 20.45h-3.56v-5.57c0-1.33-.02-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.35V9h3.41v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.46zM5.34 7.43a2.06 2.06 0 1 1 0-4.13 2.06 2.06 0 0 1 0 4.13zM7.12 20.45H3.56V9h3.56zM22.22 0H1.77C.79 0 0 .77 0 1.73v20.54C0 23.23.79 24 1.77 24h20.45c.98 0 1.78-.77 1.78-1.73V1.73C24 .77 23.2 0 22.22 0z"/></svg>Follow Us on LinkedIn</a>
+    </div>
+    <form id="form" class="rv d1" novalidate>
+      <h3>Drop us a line</h3>
+      <div class="field"><label for="fn">First name</label><input id="fn" name="first" required></div>
+      <div class="field"><label for="ln">Last name</label><input id="ln" name="last"></div>
+      <div class="field full"><label for="em">Email</label><input id="em" name="email" type="email" required></div>
+      <div class="field full"><label for="ms">Message</label><textarea id="ms" name="message" placeholder="Tell us about your facility or project."></textarea></div>
+      <button class="btn btn-red" type="submit">Send <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+      <div class="sent">Thanks for submitting!</div>
+    </form>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="f-top">
+      <div><img src="assets/logo-light.png" alt="Streamline Automation, Commissioning & Energy Services"><p>Owner-side integration of commissioning, controls and MSI that ensures buildings operate as one.</p></div>
+      <div><h5>Company</h5><a href="#who">Who We Are</a><a href="#diff">SLA Differentiators</a><a href="#integration">360 Integration</a><a href="#impact">Lasting Impact</a><a href="#pillars">Team Success</a></div>
+      <div><h5>Services</h5><a href="#services">Controls &amp; Automation</a><a href="#services">Energy Services</a><a href="#services">Commissioning</a><a href="#services">Master Systems Integration</a><a href="#approach">QAQC &amp; Project Approach</a></div>
+      <div><h5>Visit</h5><p>3025 S. 48th St. Suite 103<br>Tempe, AZ 85282</p><a href="tel:+16024386061" style="margin-top:8px">(602) 438-6061</a><a href="#location">Location</a><a class="li-link" href="https://www.linkedin.com/search/results/companies/?keywords=SLA360" target="_blank" rel="noopener">Follow Us ↗</a></div>
+    </div>
+    <div class="mega" aria-hidden="true">SLA<span>360</span>°</div>
+    <div class="f-bot"><span>© <span id="yr"></span> SLA360 · Streamline Automation, Commissioning &amp; Energy Services</span><a href="#top">Back to top ↑</a></div>
+    <p class="credits">Photo credits (CC BY, via Wikimedia Commons): plant technicians by PEO ACWA; cleanroom by University College London; rooftop HVAC by Marek Ślusarczyk; electrician by MTA Capital Construction; Tempe architecture by davidpinter. Other photos CC0 via rawpixel.</p>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/lenis@1.1.13/dist/lenis.min.js"></script>
+<script>
+(function(){
+  const $=(s,c=document)=>c.querySelector(s), $$=(s,c=document)=>[...c.querySelectorAll(s)];
+  const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+  $('#yr').textContent=new Date().getFullYear();
+
+  /* loader */
+  const arc=$('#loader .arc'), v=$('#ldv'); let p=0, loaded=false, t0=performance.now();
+  (function tick(){
+    const target=loaded?360:Math.min(330,(performance.now()-t0)/4.5);
+    p+=(target-p)*.1; arc.style.strokeDashoffset=440-440*(p/360); v.textContent=Math.round(p);
+    if(loaded&&p>358.5){ v.textContent=360; finish(); return; }
+    requestAnimationFrame(tick);
+  })();
+  addEventListener('load',()=>setTimeout(()=>loaded=true,Math.max(0,1600-(performance.now()-t0))));
+  setTimeout(()=>loaded=true,6000);
+  let fin=false;
+  function finish(){ if(fin) return; fin=true;
+    $('#loader').classList.add('done'); document.body.classList.remove('loading');
+    setTimeout(()=>document.documentElement.classList.add('ready'),350);
+    setTimeout(()=>$('#loader').remove(),1400);
+  }
+
+  /* smooth scroll */
+  let lenis=null;
+  if(!reduce&&window.Lenis){ lenis=new Lenis({duration:1.2,easing:t=>Math.min(1,1.001-Math.pow(2,-10*t))}); (function raf(t){lenis.raf(t);requestAnimationFrame(raf)})(0); }
+  const more=$('.more'), moreBtn=$('.more>button');
+  $$('a[href^="#"]').forEach(a=>a.addEventListener('click',e=>{ const id=a.getAttribute('href'); const el=id==='#top'?document.body:$(id); if(!el) return;
+    e.preventDefault(); document.body.classList.remove('menu-open'); more.classList.remove('open'); moreBtn.setAttribute('aria-expanded','false');
+    lenis?lenis.scrollTo(el,{offset:id==='#top'?0:-70}):el.scrollIntoView({behavior:'smooth'}); }));
+  $('.burger').addEventListener('click',()=>document.body.classList.toggle('menu-open'));
+
+  /* "More" dropdown: hover on desktop, click anywhere */
+  let ht; const openMore=o=>{ more.classList.toggle('open',o); moreBtn.setAttribute('aria-expanded',o); };
+  moreBtn.addEventListener('click',e=>{ e.stopPropagation(); openMore(!more.classList.contains('open')); });
+  more.addEventListener('mouseenter',()=>{ if(matchMedia('(hover:hover)').matches){ clearTimeout(ht); openMore(true);} });
+  more.addEventListener('mouseleave',()=>{ if(matchMedia('(hover:hover)').matches){ ht=setTimeout(()=>openMore(false),180);} });
+  document.addEventListener('click',e=>{ if(!more.contains(e.target)) openMore(false); });
+  document.addEventListener('keydown',e=>{ if(e.key==='Escape'){ openMore(false); document.body.classList.remove('menu-open'); } });
+
+  /* scroll effects + scrollspy */
+  const nav=$('header.nav'), prog=$('.progress'), par=$$('[data-speed]'), steps=$$('.step'), fill=$('.steps .fill'), stepsBox=$('.steps');
+  const spyIds=['who','diff','integration','impact','approach','services','pillars','location','contact'];
+  const spyEls=spyIds.map(id=>document.getElementById(id));
+  function onScroll(){
+    const y=scrollY, h=document.documentElement.scrollHeight-innerHeight;
+    nav.classList.toggle('scrolled',y>40); prog.style.transform=`scaleX(${h>0?y/h:0})`;
+    if(!reduce) par.forEach(el=>{ const box=el.parentElement.getBoundingClientRect(); const off=box.top+box.height/2-innerHeight/2; const lim=el.tagName==='IMG'?Math.max(20,box.height*.07):Math.max(40,box.height*.12); const t=Math.max(-lim,Math.min(lim,off*parseFloat(el.dataset.speed))); el.style.transform=`translate3d(0,${t}px,0)`; });
+    const r=stepsBox.getBoundingClientRect(), mid=innerHeight*.6;
+    fill.style.height=(Math.max(0,Math.min(1,(mid-r.top)/r.height))*100)+'%';
+    steps.forEach(s=>s.classList.toggle('lit', s.getBoundingClientRect().top+28<mid));
+    let cur='top'; spyEls.forEach(el=>{ if(el.getBoundingClientRect().top<innerHeight*.35) cur=el.id; });
+    $$('[data-spy]').forEach(a=>a.classList.toggle('active',a.dataset.spy===cur));
+    more.classList.toggle('active',!['top','who','diff'].includes(cur));
+  }
+  addEventListener('scroll',onScroll,{passive:true}); onScroll();
+
+  /* reveal + counters */
+  const io=new IntersectionObserver(es=>es.forEach(e=>{ if(!e.isIntersecting) return; e.target.classList.add('in'); io.unobserve(e.target);
+    $$('[data-count]',e.target).forEach(c=>{ const end=+c.dataset.count, s=performance.now(); (function f(t){ const k=Math.min(1,(t-s)/1600); c.textContent=Math.round(end*(1-Math.pow(1-k,3))); if(k<1) requestAnimationFrame(f); })(s); });
+  }),{threshold:.15,rootMargin:'0px 0px -40px 0px'});
+  $$('.rv').forEach(el=>io.observe(el));
+
+  /* 360 interactive */
+  const nodes=$$('.node'), rows=$$('.i-row');
+  function setI(i){ nodes.forEach(n=>n.classList.toggle('on',+n.dataset.i===i)); rows.forEach(r=>r.classList.toggle('on',+r.dataset.i===i)); $('.core').classList.toggle('on',i===3); }
+  nodes.forEach(n=>{ n.addEventListener('mouseenter',()=>setI(+n.dataset.i)); n.addEventListener('click',()=>setI(+n.dataset.i)); });
+  rows.forEach(r=>{ r.addEventListener('mouseenter',()=>setI(+r.dataset.i)); r.addEventListener('click',()=>setI(+r.dataset.i)); });
+  let auto=0, hov=false; $('.integ').addEventListener('mouseenter',()=>hov=true); $('.integ').addEventListener('mouseleave',()=>hov=false);
+  setInterval(()=>{ if(hov||reduce) return; auto=(auto+1)%4; setI(auto); },3200);
+
+  /* form (demo) */
+  $('#form').addEventListener('submit',e=>{ e.preventDefault(); const f=e.target;
+    if(!f.first.value.trim()){f.first.focus();return;} if(!/\S+@\S+\.\S+/.test(f.email.value)){f.email.focus();return;}
+    f.classList.add('ok'); f.querySelector('button').disabled=true; });
+})();
+</script>
+</body>
+</html>
